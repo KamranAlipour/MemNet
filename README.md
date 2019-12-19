@@ -99,3 +99,21 @@ python demo.py --cuda
 Note: 
 - This implementation is modified from the implementation of [VDSR](https://cv.snu.ac.kr/research/VDSR/) by [@Jiu XU](https://github.com/twtygqyy/pytorch-vdsr).
 - I use the default initialization methods for layers, but author uses "msra" on Paper, which results in performance difference.
+
+### PhotoAcoustic Data and training
+
+A sample set of training data for photoacoustic test is located at:
+
+and it should be located at
+```
+ ./data/frames_split_1024_train/*
+ ./data/frames_split_1024_test/*
+          
+```
+
+then the frames can be transformed to .npy files using the python codes inside data directory. that data is used in training process
+
+```
+  ./data/npy_frames_split_1024_train/*
+  ./data/npy_frames_split_1024_test/*
+```
