@@ -1,0 +1,7 @@
+__pycache__/
+data/npy_frames_split_1024_test/
+data/npy_frames_split_1024_train/
+data/frames_split_1024_test/
+data/frames_split_1024_train/
+data/frame2npy_test.py
+data/SuperResolution/*.h5
