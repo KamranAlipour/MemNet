@@ -14,15 +14,16 @@ import torch.optim as optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from memnet1 import MemNet
-from dataset import DatasetFromHdf5
+from dataset import DatasetFromHdf5, DatasetFromNpys
 
+import pdb
 # Training settings
 parser = argparse.ArgumentParser(description="PyTorch MemNet")
-parser.add_argument("--batchSize", type=int, default=512, help="Training batch size")
+parser.add_argument("--batchSize", type=int, default=1, help="Training batch size")
 parser.add_argument("--nEpochs", type=int, default=50, help="Number of epochs to train")
 parser.add_argument("--lr", type=float, default=0.1, help="the initial learning rate is 0.1")
 parser.add_argument("--step", type=int, default=20, help="Sets the learning rate is divided 10 every 20 epochs")
-parser.add_argument("--cuda", action="store_true", help="Use cuda?")
+parser.add_argument("--cuda", default=True,action="store_true", help="Use cuda?")
 parser.add_argument("--resume", default="checkpoint1/model_epoch_38.pth", type=str, help="Path to checkpoint (default: none)")
 parser.add_argument("--start-epoch", default=1, type=int, help="Manual epoch number (useful on restarts)")
 parser.add_argument("--clip", type=float, default=0.4, help="Clipping Gradients. Default=0.4")
@@ -53,8 +54,9 @@ def main():
     cudnn.benchmark = True
 
     print("===> Loading datasets")
-    train_set = DatasetFromHdf5("data/SuperResolution/train_291_31_x234.h5")
-    training_data_loader = DataLoader(dataset=train_set, num_workers=opt.threads, batch_size=opt.batchSize, shuffle=True)
+    train_set = DatasetFromNpys("data/npy_frames_split_1024_train")
+    #training_data_loader = DataLoader(dataset=train_set, num_workers=opt.threads, batch_size=opt.batchSize, shuffle=True)
+    training_data_loader = DataLoader(dataset=train_set, num_workers=0, batch_size=opt.batchSize, shuffle=True)
 
     print("===> Building model")
     model = MemNet(1, 64, 6, 6)
@@ -111,15 +113,16 @@ def train(training_data_loader, optimizer, model, criterion, epoch):
 
     for iteration, batch in enumerate(training_data_loader, 1):
         input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
-
         if opt.cuda:
             input = input.cuda()
             target = target.cuda()
-
+        input = input[:,:,:,0].unsqueeze(1)
+        target = target[:,:,:,0].unsqueeze(1)
         #loss = criterion(model(input), target)
+        pdb.set_trace()
         prediction = model(input)
         loss = criterion(prediction, target)
-        #print("Outside: input size", input.size(),"prediction_size", prediction.size())
+        print("Outside: input size", input.size(),"prediction_size", prediction.size())
         optimizer.zero_grad()
         loss.backward() 
         nn.utils.clip_grad_norm(model.parameters(),opt.clip) 
